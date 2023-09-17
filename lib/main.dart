@@ -70,14 +70,14 @@ class listView extends State<viewList> {
         context: context,
         builder: (context) {
           return AlertDialog(
-              title: Text(
+              title: const Text(
                 "Thông báo",
                 style: TextStyle(fontSize: 30),
                 textAlign: TextAlign.left,
               ),
               content: Text(
                 "Bạn có chắc chắn muốn xóa ${user.name} không ?",
-                style: TextStyle(fontSize: 18),
+                style: const TextStyle(fontSize: 18),
               ),
               actions: [
                 Row(
@@ -86,18 +86,18 @@ class listView extends State<viewList> {
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.grey,
-                          padding: EdgeInsets.symmetric(
+                          padding: const EdgeInsets.symmetric(
                               vertical: 13, horizontal: 30),
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20))),
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
-                      child: Text("Hủy"),
+                      child: const Text("Hủy"),
                     ),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                          padding: EdgeInsets.symmetric(
+                          padding: const EdgeInsets.symmetric(
                               vertical: 13, horizontal: 30),
                           backgroundColor: Colors.red,
                           shape: RoundedRectangleBorder(
@@ -105,7 +105,7 @@ class listView extends State<viewList> {
                       onPressed: () {
                         remove(user.id);
                       },
-                      child: Text("Xác nhận"),
+                      child: const Text("Xác nhận"),
                     )
                   ],
                 ),
@@ -154,7 +154,7 @@ class listView extends State<viewList> {
                         ),
                         InkWell(
                           onTap: ()=>_diadelete(context, item),
-                          child: Icon(Icons.delete),
+                          child: const Icon(Icons.delete),
                         )
                       ],
                     ),
@@ -181,7 +181,8 @@ class show extends StatefulWidget {
   final Function(User) onAdd;
   final User? initialItem;
   final bool isEditing;
-  show({required this.onAdd, this.initialItem,required this.isEditing});
+  const show({super.key, required this.onAdd, this.initialItem,required this.isEditing});
+  @override
   showDialogAddandUpdate createState() => showDialogAddandUpdate();
 }
 
@@ -232,47 +233,47 @@ class showDialogAddandUpdate extends State<show> {
           title:
           Text(widget.isEditing ? 'Cập nhật khách hàng' : 'Thêm khách hàng'),
           content: SingleChildScrollView(
-              child: Container(
+              child: SizedBox(
                 width: double.maxFinite,
                 child: Column(
                   mainAxisSize: MainAxisSize.max,
                   children: [
                     TextFormField(
                       controller: nameControler,
-                      style: TextStyle(fontSize: 18),
+                      style: const TextStyle(fontSize: 18),
                       decoration: InputDecoration(
                         errorText: errorTextName.isNotEmpty?errorTextName:null,
                           contentPadding:
-                          EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                          border: OutlineInputBorder(),
+                          const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                          border: const OutlineInputBorder(),
                           labelText: "Tên khách hàng"),
                     ),
-                    SizedBox(height: 15),
+                    const SizedBox(height: 15),
                     TextFormField(
                       controller: addressControler,
-                      style: TextStyle(fontSize: 18),
+                      style: const TextStyle(fontSize: 18),
                       decoration: InputDecoration(
                           errorText: errorTextAddress.isNotEmpty?errorTextAddress:null,
                           contentPadding:
-                          EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                          border: OutlineInputBorder(),
+                          const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                          border: const OutlineInputBorder(),
                           labelText: "Địa chỉ"),
                     ),
-                    SizedBox(height: 15),
+                    const SizedBox(height: 15),
                     TextFormField(
                       controller: phoneControler,
-                      style: TextStyle(fontSize: 18),
+                      style: const TextStyle(fontSize: 18),
                       keyboardType: TextInputType.phone,
                       decoration: InputDecoration(
 
                           errorText: errorTextPhone.isNotEmpty?errorTextPhone:null,
                           contentPadding:
-                          EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                          border: OutlineInputBorder(),
+                          const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                          border: const OutlineInputBorder(),
                           labelText: "Số điện thoại"),
                     ),
                     Container(
-                        margin: EdgeInsets.symmetric(vertical: 10),
+                        margin: const EdgeInsets.symmetric(vertical: 10),
                         child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
@@ -282,19 +283,19 @@ class showDialogAddandUpdate extends State<show> {
                                   },
                                   style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.grey,
-                                      padding: EdgeInsets.symmetric(
+                                      padding: const EdgeInsets.symmetric(
                                           vertical: 2, horizontal: 20),
                                       shape: RoundedRectangleBorder(
                                           borderRadius:
                                           BorderRadius.circular(20))),
-                                  child: Text("Cancel")),
+                                  child: const Text("Cancel")),
                               ElevatedButton(
                                   onPressed: () {
                                     onAdd();
                                   },
                                   style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.red,
-                                      padding: EdgeInsets.symmetric(
+                                      padding: const EdgeInsets.symmetric(
                                           vertical: 5, horizontal: 20),
                                       shape: RoundedRectangleBorder(
                                           borderRadius:
