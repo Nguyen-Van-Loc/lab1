@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lab1/model/User.dart';
+import 'package:lab1/validate.dart';
 
 void main() {
   runApp(const MyApp());
@@ -31,154 +32,39 @@ class viewList extends StatefulWidget {
     return listView();
   }
 }
-
 class listView extends State<viewList> {
-  final check = GlobalKey<FormState>();
-  int selectedIndex = -1;
   List<User> list = [];
   int id = 1;
-  String name = "", address = "", phone = "";
-  final nameControler = TextEditingController();
-  final addressControler = TextEditingController();
-  final phoneControler = TextEditingController();
-  final RegExp _phoneNumberRegExp = RegExp(r'^(03|09)[0-9]{8}$');
-
-  void addList(User user) {
-    if (selectedIndex == -1) {
-      setState(() {
-        user.id = id;
-        id++;
-        list.add(user);
-      });
-    }else{
-      update(selectedIndex, name, address, phone);
-    }
-  Navigator.of(context).pop();
-  }
-  void reset(){
-    selectedIndex=-1;
-    nameControler.clear();
-    addressControler.clear();
-    phoneControler.clear();
-  }
-  void update(int id,String name,String address,String phone){
-    setState(() {
-      User userUd=list[id];
-      userUd.name=name;
-      userUd.address=address;
-      userUd.phone=phone;
-    });
-  }
   void remove(int id) {
     setState(() {
       list.removeWhere((user) => user.id == id);
     });
     Navigator.of(context).pop();
   }
-
-  void _dialogBuilder() {
+  void _showDialog({User? itemEdit}) {
     showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(selectedIndex ==-1 ? "Thêm khách hàng": "Sửa khách hàng"),
-          content: SingleChildScrollView(
-            child: Form(
-              key: check,
-              child: Container(
-                width: double.maxFinite,
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    TextFormField(
-                      controller: nameControler,
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return "Tên khách hàng không được để trống";
-                        }
-                      },
-                      style: TextStyle(fontSize: 18),
-                      onChanged: (value) => name = value,
-                      decoration: InputDecoration(
-                          contentPadding:
-                              EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                          border: OutlineInputBorder(),
-                          labelText: "Tên khách hàng"),
-                    ),
-                    SizedBox(height: 15),
-                    TextFormField(
-                      controller: addressControler,
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return "Địa chỉ không được để trống";
-                        }
-                      },
-                      style: TextStyle(fontSize: 18),
-                      onChanged: (value) => address = value,
-                      decoration: InputDecoration(
-                          contentPadding:
-                              EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                          border: OutlineInputBorder(),
-                          labelText: "Địa chỉ"),
-                    ),
-                    SizedBox(height: 15),
-                    TextFormField(
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return "Số điện thoại không được để trống";
-                        } else if (!_phoneNumberRegExp.hasMatch(value)) {
-                          return 'Số điện thoại không đúng định dạng';
-                        }
-                      },
-                      controller: phoneControler,
-                      style: TextStyle(fontSize: 18),
-                      onChanged: (value) => phone = value,
-                      decoration: InputDecoration(
-                          contentPadding:
-                              EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                          border: OutlineInputBorder(),
-                          labelText: "Số điện thoại"),
-                    ),
-                    Container(
-                        margin: EdgeInsets.symmetric(vertical: 10),
-                        child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.grey,
-                                      padding: EdgeInsets.symmetric(vertical: 2,horizontal: 20),
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(20))),
-                                  child: Text("Cancel")),
-                              ElevatedButton(
-                                  onPressed: () {
-                                    if (check.currentState!.validate()) {
-                                      User newUser = User(id, name, address, phone);
-                                      addList(newUser);
-                                    }
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.red,
-                                      padding: EdgeInsets.symmetric(vertical: 5,horizontal: 20),
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                          BorderRadius.circular(20))),
-                                  child: Text("Submit"))
-                            ]))
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
+        context: context,
+        builder: (context) {
+          return show(
+            onAdd: (User item){
+              setState(() {
+                if(itemEdit==null){
+                  item.id =id++;
+                  list.add(item);
+                }else{
+                  final index =list.indexWhere((element) => element.id == itemEdit.id);
+                  if(index != -1){
+                    list[index]=item;
+                  }
+                }
+              });
+            },
+            isEditing: itemEdit !=null,
+            initialItem: itemEdit,
+          );
+        });
   }
+
   void _diadelete(BuildContext context, User user) async {
     return showDialog(
         context: context,
@@ -244,13 +130,7 @@ class listView extends State<viewList> {
                           const BorderSide(width: 1, color: Color(0xFFC9C9C9))),
                   child: ListTile(
                     onTap: () {
-                      setState(() {
-                        selectedIndex=index;
-                        nameControler.text = item.name;
-                        addressControler.text = item.address;
-                        phoneControler.text = item.phone;
-                      });
-                      _dialogBuilder();
+                      _showDialog(itemEdit: item);
                     },
                     title: Row(
                       children: [
@@ -272,13 +152,11 @@ class listView extends State<viewList> {
                             style: const TextStyle(fontSize: 18),
                           ),
                         ),
+                        InkWell(
+                          onTap: ()=>_diadelete(context, item),
+                          child: Icon(Icons.delete),
+                        )
                       ],
-                    ),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.delete_sharp),
-                      onPressed: () {
-                        _diadelete(context, item);
-                      },
                     ),
                   ),
                 );
@@ -290,8 +168,7 @@ class listView extends State<viewList> {
                 right: 15,
                 child: FloatingActionButton.extended(
                   onPressed: () {
-                    reset();
-                    _dialogBuilder();
+                    _showDialog();
                   },
                   icon: const Icon(Icons.add),
                   label: const Text("Add"),
@@ -299,7 +176,137 @@ class listView extends State<viewList> {
           ],
         ));
   }
+}
+class show extends StatefulWidget {
+  final Function(User) onAdd;
+  final User? initialItem;
+  final bool isEditing;
+  show({required this.onAdd, this.initialItem,required this.isEditing});
+  showDialogAddandUpdate createState() => showDialogAddandUpdate();
+}
 
+class showDialogAddandUpdate extends State<show> {
+  final nameControler = TextEditingController();
+  final addressControler = TextEditingController();
+  final phoneControler = TextEditingController();
+
+  String errorTextName = '';
+  String errorTextAddress = '';
+  String errorTextPhone = '';
+
+  void onAdd(){
+    setState(() {
+      errorTextName=validateName(nameControler.text);
+    });
+    if(errorTextName.isEmpty){
+      setState(() {
+        errorTextAddress=validateAddress(addressControler.text);
+      });
+      if(errorTextAddress.isEmpty){
+        setState(() {
+          errorTextPhone=validatePhone(phoneControler.text);
+        });
+        if(errorTextPhone.isEmpty){
+          User user =User(widget.isEditing?widget.initialItem!.id:-1,nameControler.text,addressControler.text,phoneControler.text);
+          widget.onAdd(user);
+          Navigator.pop(context);
+        }
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    if (widget.initialItem != null) {
+      nameControler.text = widget.initialItem!.name;
+      addressControler.text = widget.initialItem!.address;
+      phoneControler.text = widget.initialItem!.phone;
+    }
+  }
+  @override
+  Widget build(BuildContext context) {
+    final actionText = widget.isEditing ? 'Cập nhật ' : 'Thêm ';
+    return AlertDialog(
+          title:
+          Text(widget.isEditing ? 'Cập nhật khách hàng' : 'Thêm khách hàng'),
+          content: SingleChildScrollView(
+              child: Container(
+                width: double.maxFinite,
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    TextFormField(
+                      controller: nameControler,
+                      style: TextStyle(fontSize: 18),
+                      decoration: InputDecoration(
+                        errorText: errorTextName.isNotEmpty?errorTextName:null,
+                          contentPadding:
+                          EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                          border: OutlineInputBorder(),
+                          labelText: "Tên khách hàng"),
+                    ),
+                    SizedBox(height: 15),
+                    TextFormField(
+                      controller: addressControler,
+                      style: TextStyle(fontSize: 18),
+                      decoration: InputDecoration(
+                          errorText: errorTextAddress.isNotEmpty?errorTextAddress:null,
+                          contentPadding:
+                          EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                          border: OutlineInputBorder(),
+                          labelText: "Địa chỉ"),
+                    ),
+                    SizedBox(height: 15),
+                    TextFormField(
+                      controller: phoneControler,
+                      style: TextStyle(fontSize: 18),
+                      keyboardType: TextInputType.phone,
+                      decoration: InputDecoration(
+
+                          errorText: errorTextPhone.isNotEmpty?errorTextPhone:null,
+                          contentPadding:
+                          EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                          border: OutlineInputBorder(),
+                          labelText: "Số điện thoại"),
+                    ),
+                    Container(
+                        margin: EdgeInsets.symmetric(vertical: 10),
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.grey,
+                                      padding: EdgeInsets.symmetric(
+                                          vertical: 2, horizontal: 20),
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                          BorderRadius.circular(20))),
+                                  child: Text("Cancel")),
+                              ElevatedButton(
+                                  onPressed: () {
+                                    onAdd();
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.red,
+                                      padding: EdgeInsets.symmetric(
+                                          vertical: 5, horizontal: 20),
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                          BorderRadius.circular(20))),
+                                  child: Text(actionText))
+                            ]))
+                  ],
+                ),
+              ),
+            ),
+    );
+  }
   @override
   void dispose() {
     nameControler.dispose();
